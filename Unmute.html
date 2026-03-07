@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNMUTE | Your Private Ritual</title>
+    <style>
+        :root {
+            --paper: #fdfaf3;
+            --ink: #2b2826;
+            --accent: #8e7d6f;
+            --border: #e0d8cc;
+            --wax: #8b2626;
+            --sidebar: #1a1a1a;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #f4f1ea;
+            color: var(--ink);
+            overflow: hidden;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- AUTHENTICATION (FIXED LAYOUT) --- */
+        #auth-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f4f1ea; /* Matching your background */
+        }
+
+        .auth-card {
+            background: var(--paper);
+            padding: 80px 50px; /* More vertical breathing room */
+            width: 100%;
+            max-width: 450px; /* Slightly wider like the image */
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .auth-card h1 { 
+            font-style: italic; 
+            font-weight: 400; 
+            font-size: 3.5rem; 
+            margin: 0; 
+            letter-spacing: -1px; 
+        }
+
+        /* The stacked input styling */
+        .auth-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 40px;
+        }
+
+        .auth-form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border);
+            background: white;
+            font-family: 'Georgia', serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-form-group input:focus {
+            border-color: var(--accent);
+        }
+
+        /* The bold black button from your screenshot */
+        .login-btn {
+            background: #1a1a1a;
+            color: white;
+            padding: 22px;
+            border: none;
+            width: 100%;
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #000;
+        }
+
+        /* --- THE PROFESSIONAL SHELL (NO CHANGES) --- */
+        #journal-page {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            color: #d1ccc0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #000;
+        }
+
+        .sidebar-brand {
+            padding: 40px 30px;
+            font-size: 1.8rem;
+            font-style: italic;
+            border-bottom: 1px solid #333;
+            color: white;
+        }
+
+        .top-nav {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 15px 30px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #888;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: white;
+            background: #252525;
+        }
+
+        .nav-item.active { border-left: 3px solid var(--accent); }
+
+        .main-canvas {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            background: #e9e4d9; 
+        }
+
+        .journal-paper {
+            background: var(--paper);
+            width: 100%;
+            max-width: 800px;
+            padding: 100px 100px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            min-height: fit-content;
+        }
+
+        .ritual-header { text-align: center; margin-bottom: 80px; }
+        
+        #current-date {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            display: block;
+            margin-top: 10px;
+        }
+
+        .prompt-box { margin-bottom: 60px; }
+        .prompt-box label {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--ink);
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+            font-style: italic;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 1px solid transparent;
+            background: transparent;
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            outline: none;
+            color: #4a4542;
+            line-height: 1.6;
+        }
+
+        input:focus, textarea:focus { border-bottom: 1px solid var(--border); }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 20px 0;
+            accent-color: var(--accent);
+        }
+
+        .primary-btn {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 20px 60px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.4s;
+        }
+
+        .primary-btn:hover { background: #000; letter-spacing: 4px; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-box {
+            padding: 30px;
+            border: 1px solid var(--border);
+            background: #fbf9f4;
+            text-align: center;
+        }
+
+        .capsule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .sealed-capsule {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            padding: 40px 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .sealed-capsule:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .wax-seal {
+            width: 30px;
+            height: 30px;
+            background: var(--wax);
+            border-radius: 50%;
+            margin: 20px auto 0;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="auth-card">
+            <h1>unmute.</h1>
+            <p id="auth-subtitle" style="letter-spacing: 3px; font-size: 0.75rem; color: var(--accent); margin: 15px 0 0; text-transform: uppercase;">A Weekly Emotional Ritual</p>
+            
+            <div class="auth-form-group">
+                <input type="text" id="user-name" class="hidden" placeholder="Your Name">
+                <input type="email" id="user-email" placeholder="Email Address">
+                <input type="password" id="user-pass" placeholder="Password">
+                <button type="button" class="login-btn" onclick="enterRitual()">Enter Space</button>
+            </div>
+
+            <span class="toggle-link" id="auth-toggle" onclick="toggleAuth()" style="display:block; margin-top:35px; font-size:0.85rem; color:var(--accent); cursor:pointer; text-decoration:underline;">New here? Create a ritual</span>
+        </div>
+    </div>
+
+    <div id="journal-page" class="hidden">
+        
+        <div class="sidebar">
+            <div class="sidebar-brand">unmute.</div>
+            <div class="top-nav">
+                <span id="nav-ritual" onclick="showSection('ritual')" class="nav-item active">The Ritual</span>
+                <span id="nav-dashboard" onclick="showSection('dashboard')" class="nav-item">Archive Stats</span>
+                <span id="nav-vault" onclick="showSection('vault')" class="nav-item">The Vault</span>
+            </div>
+            <div style="padding: 30px; font-size: 0.7rem; color: #555; letter-spacing: 1px;">© 2026 UNMUTE</div>
+        </div>
+
+        <div class="main-canvas">
+            <div class="journal-paper">
+                
+                <div id="ritual-section">
+                    <div class="ritual-header">
+                        <h1>Current Ritual</h1>
+                        <span id="current-date"></span>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>One word to define this week</label>
+                        <input type="text" placeholder="Type here...">
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>What was the heaviest thing you carried?</label>
+                        <textarea placeholder="Write it down to set it aside..."></textarea>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>Something you survived</label>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>What made you feel most alive?</label>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>Who did you show up for this week?</label>
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>Overall mood this week</label>
+                        <input type="range" id="weeklyMood" min="1" max="5" value="3">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">
+                            <span>Heavy</span>
+                            <span>Light</span>
+                        </div>
+                    </div>
+
+                    <div class="prompt-box">
+                        <label>A message to your future self</label>
+                        <textarea placeholder="Sealed until next month..."></textarea>
+                    </div>
+
+                    <div class="seal-area" style="text-align: center; border-top: 1px solid var(--border); padding-top: 50px;">
+                        <button class="primary-btn" onclick="sealWeek()">Seal this week</button>
+                    </div>
+                </div>
+
+                <div id="dashboard" class="dashboard-section" style="display:none;">
+                    <h2 style="font-style:italic; font-weight: 400; font-size: 2rem;">Emotional Archive</h2>
+                    <p style="color:var(--accent);">A summary of your journey so far.</p>
+                    
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div style="font-size: 0.7rem; color: var(--accent); text-transform: uppercase;">Weeks</div>
+                            <div style="font-size: 2rem;" id="weeksCompleted">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div style="font-size: 0.7rem; color: var(--accent); text-transform: uppercase;">Streak</div>
+                            <div style="font-size: 2rem;" id="streak">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div style="font-size: 0.7rem; color: var(--accent); text-transform: uppercase;">Avg Mood</div>
+                            <div style="font-size: 2rem;" id="averageMood">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vault" class="vault-page" style="display:none;">
+                    <h2 style="font-style:italic; font-weight: 400; font-size: 2rem;">The Time Capsule</h2>
+                    <p style="color:var(--accent);">Sealed entries waiting for the month to end.</p>
+                    <div class="capsule-grid">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // REMAINS 100% YOUR ORIGINAL LOGIC
+        let isLoginMode = true;
+        let currentUser = null;
+
+        function toggleAuth() {
+            const subtitle = document.getElementById('auth-subtitle');
+            const nameInput = document.getElementById('user-name');
+            isLoginMode = !isLoginMode;
+            subtitle.innerText = isLoginMode ? "A Weekly Emotional Ritual" : "Begin your journey";
+            document.getElementById('auth-toggle').innerText = isLoginMode ? "New here? Create a ritual" : "Already have a space? Sign in";
+            nameInput.classList.toggle('hidden');
+        }
+
+        function enterRitual() {
+            const email = document.getElementById('user-email').value;
+            if (email.includes('@')) {
+                currentUser = email;
+                localStorage.setItem("currentUser", email);
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('journal-page').classList.remove('hidden');
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString("en-US", options);
+                loadDashboard();
+                renderCapsules();
+            } else {
+                alert("Please enter a valid email.");
+            }
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav-' + section).classList.add('active');
+            document.getElementById('ritual-section').style.display = (section === 'ritual') ? 'block' : 'none';
+            document.getElementById('dashboard').style.display = (section === 'dashboard') ? 'block' : 'none';
+            document.getElementById('vault').style.display = (section === 'vault') ? 'block' : 'none';
+        }
+
+        function sealWeek() {
+            const mood = document.getElementById("weeklyMood").value;
+            const entry = { date: new Date(), mood: parseInt(mood) };
+            let data = JSON.parse(localStorage.getItem(currentUser)) || [];
+            data.push(entry);
+            localStorage.setItem(currentUser, JSON.stringify(data));
+            
+            alert("Entry sealed in the vault.");
+            loadDashboard();
+            renderCapsules();
+            showSection('vault');
+        }
+
+        function loadDashboard() {
+            const data = JSON.parse(localStorage.getItem(currentUser)) || [];
+            document.getElementById("weeksCompleted").innerText = data.length;
+            document.getElementById("streak").innerText = data.length;
+            if (data.length > 0) {
+                const avg = data.reduce((sum, e) => sum + e.mood, 0) / data.length;
+                document.getElementById("averageMood").innerText = avg.toFixed(1);
+            }
+        }
+
+        function renderCapsules() {
+            const capsuleGrid = document.querySelector(".capsule-grid");
+            capsuleGrid.innerHTML = "";
+            const data = JSON.parse(localStorage.getItem(currentUser)) || [];
+            const today = new Date();
+
+            data.forEach(entry => {
+                const entryDate = new Date(entry.date);
+                const capsule = document.createElement("div");
+                capsule.className = "sealed-capsule";
+                capsule.innerHTML = `<span class="capsule-date">${entryDate.toDateString().slice(4,10).toUpperCase()}</span><div class="wax-seal"></div>`;
+                
+                capsule.onclick = () => {
+                    if (entryDate.getMonth() === today.getMonth() && entryDate.getFullYear() === today.getFullYear()) {
+                        alert("Still resting. Unlocks next month.");
+                    } else {
+                        alert("Archived Mood: " + entry.mood + "/5");
+                    }
+                };
+                capsuleGrid.appendChild(capsule);
+            });
+        }
+    </script>
+</body>
+</html>
